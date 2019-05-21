@@ -70,21 +70,78 @@ class _LandingPageState extends State<LandingPage> {
         )),
         body: TabBarView(
           children: [
-            Icon(
-              Icons.directions_car,
-              color: Colors.black,
-            ),
-            Icon(
-              Icons.directions_transit,
-              color: Colors.black,
-            ),
-            Icon(
-              Icons.directions_bike,
-              color: Colors.black,
-            ),
+            ListView.builder(
+                itemCount: 8,
+                itemBuilder: (context, int i) {
+                  return new OwnerCard(
+                    color: Colors.green,
+                    percentage: "76%",
+                  );
+                }),
+            ListView.builder(
+                itemCount: 8,
+                itemBuilder: (context, int i) {
+                  return new OwnerCard(
+                    color: Colors.yellow,
+                  );
+                }),
+            ListView.builder(
+                itemCount: 8,
+                itemBuilder: (context, int i) {
+                  return new OwnerCard(
+                    color: Colors.red,
+                    percentage: "56%",
+                  );
+                }),
           ],
         ),
       ),
+    );
+  }
+}
+
+class OwnerCard extends StatelessWidget {
+  final String title;
+  final String name;
+  final Color color;
+  final String percentage;
+  const OwnerCard({
+    this.percentage = "0%",
+    this.color = Colors.red,
+    this.title = "Components",
+    this.name = "Markus Kohler",
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {},
+      child: Card(
+          margin: EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 5),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 4.0,
+          color: this.color,
+          child: Padding(
+              padding: EdgeInsets.all(25.0),
+              child: ListTile(
+                leading: FlutterLogo(
+                  size: 50,
+                ),
+                title: Text(title,
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                subtitle: Text(name,
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF666A6D))),
+                trailing: Text(
+                  this.percentage,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              ))),
     );
   }
 }
