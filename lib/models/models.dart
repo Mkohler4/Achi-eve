@@ -1,6 +1,5 @@
 
 
-import 'dart:math';
 
 class Profile{
   String _name;
@@ -12,31 +11,41 @@ class Profile{
 
 class Project{
 
+  final Graph _graph;
+
+  Project(this._graph);
 
   List<Component> ownerList(String name){
     List<Component> list = [];
-
+    for (Component item in _graph._components) {
+      if(item.name == name) list.add(item);
+    }
 
     return list;
   }
 
   List<Component> openList(){
     List<Component> list = [];
-
-
+    for (var i = 0; i < _graph.getComponents().length; i++) {
+      if(!_graph.hasConnections(i) && _graph.getComponent(i).owner == "") list.add(_graph.getComponent(i));
+    }
     return list;
   }
 
   List<Component> closedList(){
     List<Component> list = [];
-
+    for (var i = 0; i < _graph.getComponents().length; i++) {
+      if(_graph.hasConnections(i)) list.add(_graph.getComponent(i));
+    }
 
     return list;
   }
 
-  List<Component> takenList(){
+  List<Component> takenList(String name){
     List<Component> list = [];
-
+    for (Component item in _graph._components) {
+      if(item.name != name && openList().contains(item)) list.add(item);
+    }
 
     return list;
   }
@@ -57,6 +66,8 @@ class Graph{
   List<List<bool>> _adj;
 
   List<Component> _components;
+
+  List<Component> getComponents() => _components;
 
   void addNode(Component component){
     _components.add(component);
@@ -82,5 +93,12 @@ class Graph{
 
   Component getComponent(int index){
     return _components[index];
+  }
+
+  int getComponentIndex(Component comp){
+    for (int i = 0; i < _components.length; i++) {
+      if(_components[i] == comp) return i;
+    }
+    return -1;
   }
 }
