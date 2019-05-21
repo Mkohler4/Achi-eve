@@ -12,9 +12,17 @@ class Profile{
 
 class Project{
 
-  final Graph _graph;
+  Graph _graph;
 
   Project(this._graph);
+
+  factory Project.fromJSON(Map<String, dynamic> json){
+    Graph graph = Graph();
+    //TODO: graph binding logic
+    return Project(graph);
+  }
+
+  List<Component> getAll() => _graph.getComponents();
 
   List<Component> ownerList(String password){
     List<Component> list = [];
