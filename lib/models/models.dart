@@ -44,6 +44,12 @@ class Project{
 }
 
 class Component{
+  String name;
+  String desc;
+  String owner;
+  double percentage;
+  
+  Component(this.name, this.percentage, {this.owner = "", this.desc = ""});
 
 }
 
@@ -65,6 +71,14 @@ class Graph{
   }
 
   bool isConnection(int startIndex, int endIndex) => _adj[startIndex][endIndex];
+
+  ///checks if anything is connected to the indexed component
+  bool hasConnections(int index){
+    for (List<bool> list in _adj) {
+      if(list[index]) return true;
+    }
+    return false;
+  }
 
   Component getComponent(int index){
     return _components[index];
