@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'discriptionPage.dart';
 
 class LandingPage extends StatefulWidget {
   bool isSelected1;
@@ -16,7 +17,11 @@ class _LandingPageState extends State<LandingPage> {
       child: Scaffold(
         appBar: AppBar(
           iconTheme: new IconThemeData(color: Colors.black),
-          title: Text("Projects", style: TextStyle(color: Colors.black)),
+          title: Text("Projects",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 23)),
           centerTitle: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -68,33 +73,55 @@ class _LandingPageState extends State<LandingPage> {
             ),
           ],
         )),
-        body: TabBarView(
-          children: [
-            ListView.builder(
-                itemCount: 8,
-                itemBuilder: (context, int i) {
-                  return new OwnerCard(
-                    color: Colors.green,
-                    percentage: "76%",
-                  );
-                }),
-            ListView.builder(
-                itemCount: 8,
-                itemBuilder: (context, int i) {
-                  return new OwnerCard(
-                    color: Colors.yellow,
-                  );
-                }),
-            ListView.builder(
-                itemCount: 8,
-                itemBuilder: (context, int i) {
-                  return new OwnerCard(
-                    color: Colors.red,
-                    percentage: "56%",
-                  );
-                }),
-          ],
-        ),
+        body: Stack(children: <Widget>[
+          TabBarView(
+            children: [
+              ListView.builder(
+                  itemCount: 8,
+                  itemBuilder: (context, int i) {
+                    return new OwnerCard(
+                      color: Colors.green,
+                      percentage: "76%",
+                    );
+                  }),
+              ListView.builder(
+                  itemCount: 8,
+                  itemBuilder: (context, int i) {
+                    return new OwnerCard(
+                      color: Colors.yellow,
+                    );
+                  }),
+              ListView.builder(
+                  itemCount: 8,
+                  itemBuilder: (context, int i) {
+                    return new OwnerCard(
+                      color: Colors.red,
+                      percentage: "56%",
+                    );
+                  }),
+            ],
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Card(
+                  margin:
+                      EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 5),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  elevation: 4.0,
+                  color: Colors.black,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: 1, bottom: 14, left: 100, right: 300),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ]),
       ),
     );
   }
@@ -116,7 +143,12 @@ class OwnerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DiscriptionPage()),
+        );
+      },
       child: Card(
           margin: EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 5),
           shape:
