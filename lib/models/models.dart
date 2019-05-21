@@ -3,8 +3,9 @@
 
 class Profile{
   String _name;
+  String password;
 
-  Profile(this._name);
+  Profile(this._name, this.password);
 
   String getName() => _name;
 }
@@ -15,10 +16,10 @@ class Project{
 
   Project(this._graph);
 
-  List<Component> ownerList(String name){
+  List<Component> ownerList(String password){
     List<Component> list = [];
     for (Component item in _graph._components) {
-      if(item.name == name) list.add(item);
+      if(item.ownerPassword == password) list.add(item);
     }
 
     return list;
@@ -27,7 +28,7 @@ class Project{
   List<Component> openList(){
     List<Component> list = [];
     for (var i = 0; i < _graph.getComponents().length; i++) {
-      if(!_graph.hasConnections(i) && _graph.getComponent(i).owner == "") list.add(_graph.getComponent(i));
+      if(!_graph.hasConnections(i) && _graph.getComponent(i).ownerPassword == "") list.add(_graph.getComponent(i));
     }
     return list;
   }
@@ -41,10 +42,10 @@ class Project{
     return list;
   }
 
-  List<Component> takenList(String name){
+  List<Component> takenList(String password){
     List<Component> list = [];
     for (Component item in _graph._components) {
-      if(item.name != name && openList().contains(item)) list.add(item);
+      if(item.ownerPassword != password && openList().contains(item)) list.add(item);
     }
 
     return list;
@@ -55,10 +56,10 @@ class Project{
 class Component{
   String name;
   String desc;
-  String owner;
+  String ownerPassword;
   double percentage;
   
-  Component(this.name, this.percentage, {this.owner = "", this.desc = ""});
+  Component(this.name, this.percentage, {this.ownerPassword = "", this.desc = ""});
 
 }
 
