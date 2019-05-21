@@ -1,6 +1,4 @@
 
-
-
 class Profile{
   String _name;
   String password;
@@ -12,21 +10,29 @@ class Profile{
 
 class Project{
 
-  Graph _graph;
+  Graph graph;
 
-  Project(this._graph);
+  Project(this.graph);
 
   factory Project.fromJSON(Map<String, dynamic> json){
     Graph graph = Graph();
-    //TODO: graph binding logic
+    List<dynamic> list = json["values"];
+
+    for (int i = 0; i < list.length; i++) {
+      graph.addNode(Component(list[i][0], 0));
+    }
+
+    graph.printGraph();
+
+
     return Project(graph);
   }
 
-  List<Component> getAll() => _graph.getComponents();
+  List<Component> getAll() => graph.getComponents();
 
   List<Component> ownerList(String password){
     List<Component> list = [];
-    for (Component item in _graph._components) {
+    for (Component item in graph.getComponents()) {
       if(item.ownerPassword == password) list.add(item);
     }
 
@@ -35,16 +41,16 @@ class Project{
 
   List<Component> openList(){
     List<Component> list = [];
-    for (var i = 0; i < _graph.getComponents().length; i++) {
-      if(!_graph.hasConnections(i) && _graph.getComponent(i).ownerPassword == "") list.add(_graph.getComponent(i));
+    for (var i = 0; i < graph.getComponents().length; i++) {
+      if(!graph.hasConnections(i) && graph.getComponent(i).getData().ownerPassword == "") list.add(graph.getComponent(i).getData());
     }
     return list;
   }
 
   List<Component> closedList(){
     List<Component> list = [];
-    for (var i = 0; i < _graph.getComponents().length; i++) {
-      if(_graph.hasConnections(i)) list.add(_graph.getComponent(i));
+    for (var i = 0; i < graph.getComponents().length; i++) {
+      if(graph.hasConnections(i)) list.add(graph.getComponent(i).getData());
     }
 
     return list;
@@ -52,13 +58,13 @@ class Project{
 
   List<Component> takenList(String password){
     List<Component> list = [];
-    for (Component item in _graph._components) {
+    for (Component item in graph.getComponents()) {
       if(item.ownerPassword != password && openList().contains(item)) list.add(item);
     }
 
     return list;
   }
-
+  
 }
 
 class Component{
@@ -71,43 +77,76 @@ class Component{
 
 }
 
+class Edge{
+  
+  List<Vertex> endPoints = [];
+
+  Edge(Vertex u, Vertex v){
+    endPoints.add(u);
+    endPoints.add(v);
+  }
+
+}
+
+class Vertex{
+  Component _data;
+  List<Edge> incoming = [];
+  List<Edge> outgoing = [];
+
+  Vertex(this._data);
+
+  Component getData() => _data;
+
+}
+
 class Graph{
-  List<List<bool>> _adj;
+  final List<Edge> _edges = [];
+  final List<Vertex> _vertecies = [];
 
-  List<Component> _components;
-
-  List<Component> getComponents() => _components;
+  List<Component> getComponents(){
+    List<Component> list = [];
+    for (Vertex vertex in _vertecies) {
+      list.add(vertex.getData());
+    }
+    return list;
+  }
 
   void addNode(Component component){
-    _components.add(component);
-    for (List<bool> list in _adj) {
-      list.add(false);
-    }
-    _adj.add(List<bool>(_adj[0].length));
+    _vertecies.add(Vertex(component));
   }
 
   void addConnection(int startIndex, int endIndex){
-    _adj[startIndex][endIndex] = true;
+    Edge e = Edge(getComponent(startIndex), getComponent(endIndex));
+    getComponent(startIndex).outgoing.add(e);
+    getComponent(endIndex).incoming.add(e);
+    _edges.add(e);
   }
-
-  bool isConnection(int startIndex, int endIndex) => _adj[startIndex][endIndex];
 
   ///checks if anything is connected to the indexed component
-  bool hasConnections(int index){
-    for (List<bool> list in _adj) {
-      if(list[index]) return true;
-    }
-    return false;
+  bool hasConnections(int index) => _vertecies[index].incoming.length > 0 ? true : false;
+
+  Vertex getComponent(int index){
+    return _vertecies[index];
   }
 
-  Component getComponent(int index){
-    return _components[index];
-  }
-
-  int getComponentIndex(Component comp){
-    for (int i = 0; i < _components.length; i++) {
-      if(_components[i] == comp) return i;
+  int getComponentIndex(Vertex comp){
+    for (int i = 0; i < _vertecies.length; i++) {
+      if(_vertecies[i] == comp) return i;
     }
     return -1;
+  }
+
+  void printGraph(){
+    print("Verticies:");
+    for (Vertex vertex in _vertecies) {
+      print(vertex.getData().name);
+    }
+    print("");
+    print("Edges:");
+    for (Edge edge in _edges) {
+      print(edge.endPoints[0].getData().name + "->" + edge.endPoints[1].getData().name);
+    }
+    print("---------------");
+    print("");
   }
 }

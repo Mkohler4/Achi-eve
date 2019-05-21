@@ -63,12 +63,13 @@ class _TestState extends State<Test> {
         padding: const EdgeInsets.only(top: 8.0),
         child: Container(
           child: ListView.builder(
+            itemCount: project == null ? 0 : project.getAll().length,
             itemBuilder: (context, i){
               return Card(
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(project.getAll()[i].name),
+                    child: Text(project != null ? project.getAll()[i].name : ""),
                   )
                 )
               );
