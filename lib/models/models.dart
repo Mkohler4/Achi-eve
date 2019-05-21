@@ -16,14 +16,23 @@ class Project{
 
   factory Project.fromJSON(Map<String, dynamic> json){
     Graph graph = Graph();
+
+    //add verticies to the graph
     List<dynamic> list = json["values"];
 
     for (int i = 0; i < list.length; i++) {
       graph.addNode(Component(list[i][0], 0));
     }
 
-    graph.printGraph();
+    //add edges to the graph
+    for (int i = 0; i < list.length; i++) {
+      for (int j = 1; j < list[i].length; j++) {
+        if(list[i][j] == "1")
+          graph.addConnection(i, j-1);
+      }
+    }
 
+    // graph.printGraph();
 
     return Project(graph);
   }

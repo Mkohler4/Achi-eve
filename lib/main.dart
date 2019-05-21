@@ -49,7 +49,9 @@ class _TestState extends State<Test> {
 
     if (response.statusCode == 200) {
       // If server returns an OK response, parse the JSON
-      project = Project.fromJSON(json.decode(response.body));
+      setState(() {
+        project = Project.fromJSON(json.decode(response.body));
+      });
     } else {
       // If that response was not OK, throw an error.
       throw Exception('Failed to load post');
