@@ -85,7 +85,7 @@ class Project{
   List<Component> takenList(String password){
     List<Component> list = [];
     for (Component item in graph.getComponents()) {
-      if(item.ownerPassword != password && openList().contains(item)) list.add(item);
+      if(item.ownerPassword != password && item.ownerPassword != "") list.add(item);
     }
 
     return list;
