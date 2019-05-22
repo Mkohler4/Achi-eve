@@ -16,7 +16,7 @@ class LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<LandingPage> {
 
-  String userPassword = "ibte";
+  String userPassword;
 
   Project project;
 
@@ -38,10 +38,32 @@ class _LandingPageState extends State<LandingPage> {
     }
   }
 
+  Widget options(){
+    return AlertDialog(
+      content: Form(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(child: Text("Options", style: TextStyle(fontSize: 20),)),
+            ),
+            TextFormField(
+              
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    userPassword = json.decode("info.json")["name"];
+
     pullInfo(); //starts by pulling the ifo from the server
   }
 
@@ -56,7 +78,14 @@ class _LandingPageState extends State<LandingPage> {
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.settings),
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context){
+                    return options();
+                  }
+                );
+              },
             )
           ],
           iconTheme: new IconThemeData(color: Colors.black),
@@ -124,7 +153,7 @@ class _LandingPageState extends State<LandingPage> {
         body: Stack(children: <Widget>[
           TabBarView(
             children: [
-              project.ownerList(userPassword).length != 0 ?
+              project.ownerList(userPassword).length != 0 && project != null ?
                 ListView.builder(
                   itemCount: project != null ? project.ownerList(userPassword).length : 0,
                   itemBuilder: (context, int i) {
@@ -138,7 +167,7 @@ class _LandingPageState extends State<LandingPage> {
                 ) :
               OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
 
-              project.openList().length != 0 ?
+              project.openList().length != 0  && project != null ?
                 ListView.builder(
                   itemCount: project != null ? project.openList().length : 0,
                   itemBuilder: (context, int i) {
@@ -151,7 +180,7 @@ class _LandingPageState extends State<LandingPage> {
                 ) : 
                 OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
 
-              project.getAll().length != 0 ? 
+              project.getAll().length != 0  && project != null ? 
                 ListView.builder(
                   
                   itemCount: project != null ? project.getAll().length : 0,
