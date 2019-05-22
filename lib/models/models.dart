@@ -41,8 +41,10 @@ class Project{
 
   List<Component> ownerList(String password){
     List<Component> list = [];
+    print(password);
     for (Component item in graph.getComponents()) {
       if(item.ownerPassword == password) list.add(item);
+      print(item.ownerPassword);
     }
 
     return list;
@@ -73,6 +75,15 @@ class Project{
 
     return list;
   }
+
+  // ///returns diiferent string alues for the status of the task
+  // ///O - open
+  // ///Y - yours
+  // ///T - taken
+  // ///C - closed
+  // String componentStatus(Component comp){
+    
+  // }
   
 }
 

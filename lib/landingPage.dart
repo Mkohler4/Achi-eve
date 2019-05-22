@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'discriptionPage.dart';
+import 'models/models.dart';
+
+import 'package:http/http.dart' as http;
 
 class LandingPage extends StatefulWidget {
   bool isSelected1;
@@ -10,6 +15,36 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
+
+  String userPassword = "ibte";
+
+  Project project;
+
+  String spreadsheetID = "1UyYdOLiPKpJ_0qkSnWFzriqiVcu6CnfZQibdeKya-sM";
+  String apiKey = "AIzaSyA8fqeR9BYGxm_AV1h3nZ0fhFt_XSuF9p0";
+
+  Future<void> pullInfo() async{
+    final response =
+        await http.get("https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetID}/values/Sheet1?key=${apiKey}");
+
+    if (response.statusCode == 200) {
+      // If server returns an OK response, parse the JSON
+      setState(() {
+        project = Project.fromJSON(json.decode(response.body));
+      });
+    } else {
+      // If that response was not OK, throw an error.
+      throw Exception('Failed to load post');
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    pullInfo(); //starts by pulling the ifo from the server
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -77,26 +112,38 @@ class _LandingPageState extends State<LandingPage> {
           TabBarView(
             children: [
               ListView.builder(
-                  itemCount: 8,
+                  itemCount: project != null ? project.ownerList(userPassword).length : 0,
                   itemBuilder: (context, int i) {
                     return new OwnerCard(
                       color: Colors.green,
                       percentage: "76%",
+                      name: project.ownerList("")[i].name,
                     );
                   }),
               ListView.builder(
-                  itemCount: 8,
+                  itemCount: project != null ? project.openList().length : 0,
                   itemBuilder: (context, int i) {
                     return new OwnerCard(
                       color: Colors.yellow,
+                      name: project.openList()[i].name,
                     );
                   }),
               ListView.builder(
-                  itemCount: 8,
+                  itemCount: project != null ? project.getAll().length : 0,
                   itemBuilder: (context, int i) {
+                    print("hi");
+                    List<Component> fullList = [];
+                    fullList.addAll(project.ownerList(userPassword));
+                    fullList.addAll(project.openList());
+                    fullList.addAll(project.takenList(userPassword));
+                    fullList.addAll(project.closedList());
                     return new OwnerCard(
-                      color: Colors.red,
+                      color:i < project.ownerList(userPassword).length ? Colors.green : //owner
+                            i < project.ownerList(userPassword).length + project.openList().length ? Colors.yellow : //open
+                            i < project.ownerList(userPassword).length + project.openList().length + project.takenList("").length ? Colors.red : //taken
+                            Colors.grey, //closed
                       percentage: "56%",
+                      name: fullList[i].name,
                     );
                   }),
             ],
