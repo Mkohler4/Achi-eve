@@ -111,43 +111,51 @@ class _LandingPageState extends State<LandingPage> {
         body: Stack(children: <Widget>[
           TabBarView(
             children: [
-              ListView.builder(
-                itemCount: project != null ? project.ownerList(userPassword).length : 0,
-                itemBuilder: (context, int i) {
-                  return new OwnerCard(
-                    color: Colors.green,
-                    percentage: "76%",
-                    title: project.ownerList(userPassword)[i].name,
-                    name: project.ownerList(userPassword)[i].ownerPassword,
-                  );
-                }
-              ),
-              ListView.builder(
-                itemCount: project != null ? project.openList().length : 0,
-                itemBuilder: (context, int i) {
-                  return new OwnerCard(
-                    color: Colors.yellow,
-                    title: project.openList()[i].name,
-                    name: project.openList()[i].ownerPassword,
-                  );
-                }
-              ),
-              ListView.builder(
-                
-                itemCount: project != null ? project.getAll().length : 0,
-                itemBuilder: (context, int i) {
-                  String status = project.componentStatus(project.getAll()[i], userPassword); //task status determiner
-                  return new OwnerCard(
-                    color:status == "O" ? Colors.yellow : //open tasks
-                          status == "Y" ? Colors.green : //owner tasks
-                          status == "T" ? Colors.red : //taken tasks
-                          Colors.grey, //closed takss
-                    percentage: "76%",
-                    title: project.getAll()[i].name,
-                    name: project.getAll()[i].ownerPassword,
-                  );
-                }
-              )
+              project.ownerList(userPassword).length != 0 ?
+                ListView.builder(
+                  itemCount: project != null ? project.ownerList(userPassword).length : 0,
+                  itemBuilder: (context, int i) {
+                    return new OwnerCard(
+                      color: Colors.green,
+                      percentage: "76%",
+                      title: project.ownerList(userPassword)[i].name,
+                      name: project.ownerList(userPassword)[i].ownerPassword,
+                    );
+                  }
+                ) :
+              OwnerCard(color: Colors.white, title: "Nothing to show", percentage: "", name: "",),
+
+              project.openList().length != 0 ?
+                ListView.builder(
+                  itemCount: project != null ? project.openList().length : 0,
+                  itemBuilder: (context, int i) {
+                    return new OwnerCard(
+                      color: Colors.yellow,
+                      title: project.openList()[i].name,
+                      name: project.openList()[i].ownerPassword,
+                    );
+                  }
+                ) : 
+                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: "", name: "",),
+
+              project.getAll().length != 0 ? 
+                ListView.builder(
+                  
+                  itemCount: project != null ? project.getAll().length : 0,
+                  itemBuilder: (context, int i) {
+                    String status = project.componentStatus(project.getAll()[i], userPassword); //task status determiner
+                    return new OwnerCard(
+                      color:status == "O" ? Colors.yellow : //open tasks
+                            status == "Y" ? Colors.green : //owner tasks
+                            status == "T" ? Colors.red : //taken tasks
+                            Colors.grey, //closed takss
+                      percentage: "76%",
+                      title: project.getAll()[i].name,
+                      name: project.getAll()[i].ownerPassword,
+                    );
+                  }
+                ) : 
+                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: "", name: "",)
             ],
           ),
           Column(
