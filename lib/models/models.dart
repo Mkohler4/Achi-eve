@@ -91,14 +91,17 @@ class Project{
     return list;
   }
 
-  // ///returns diiferent string alues for the status of the task
-  // ///O - open
-  // ///Y - yours
-  // ///T - taken
-  // ///C - closed
-  // String componentStatus(Component comp){
-    
-  // }
+  ///returns diiferent string alues for the status of the task
+  ///O - open
+  ///Y - yours
+  ///T - taken
+  ///C - closed
+  String componentStatus(Component comp, String password){
+    if(openList().contains(comp)) return "O";
+    else if(ownerList(password).contains(comp)) return "Y";
+    else if(takenList(password).contains(comp)) return "T";
+    else return "C";
+  }
   
 }
 
