@@ -50,7 +50,15 @@ class _LandingPageState extends State<LandingPage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+
+        //APPBAR
         appBar: AppBar(
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {},
+            )
+          ],
           iconTheme: new IconThemeData(color: Colors.black),
           title: Text("Projects",
               style: TextStyle(
@@ -85,29 +93,34 @@ class _LandingPageState extends State<LandingPage> {
             ],
           ),
         ),
+
+        //DRAWER
         drawer: Drawer(
-            child: ListView(
-          children: <Widget>[
-            ListTile(
-              selected: true,
-              title: Text(
-                "Website",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          child: ListView(
+            children: <Widget>[
+              ListTile(
+                selected: true,
+                title: Text(
+                  "Website",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                trailing: Icon(Icons.arrow_forward),
+                onTap: () {},
               ),
-              trailing: Icon(Icons.arrow_forward),
-              onTap: () {},
-            ),
-            ListTile(
-              selected: false,
-              title: Text(
-                "Appliciation",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ListTile(
+                selected: false,
+                title: Text(
+                  "Appliciation",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                trailing: Icon(Icons.arrow_forward),
+                onTap: () {},
               ),
-              trailing: Icon(Icons.arrow_forward),
-              onTap: () {},
-            ),
-          ],
-        )),
+            ],
+          )
+        ),
+
+        //BODY
         body: Stack(children: <Widget>[
           TabBarView(
             children: [
@@ -117,13 +130,13 @@ class _LandingPageState extends State<LandingPage> {
                   itemBuilder: (context, int i) {
                     return new OwnerCard(
                       color: Colors.green,
-                      percentage: "76%",
+                      percentage:  project.ownerList(userPassword)[i].difficulty,
                       title: project.ownerList(userPassword)[i].name,
                       name: project.ownerList(userPassword)[i].ownerPassword,
                     );
                   }
                 ) :
-              OwnerCard(color: Colors.white, title: "Nothing to show", percentage: "", name: "",),
+              OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
 
               project.openList().length != 0 ?
                 ListView.builder(
@@ -136,7 +149,7 @@ class _LandingPageState extends State<LandingPage> {
                     );
                   }
                 ) : 
-                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: "", name: "",),
+                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
 
               project.getAll().length != 0 ? 
                 ListView.builder(
@@ -149,13 +162,13 @@ class _LandingPageState extends State<LandingPage> {
                             status == "Y" ? Colors.green : //owner tasks
                             status == "T" ? Colors.red : //taken tasks
                             Colors.grey, //closed takss
-                      percentage: "76%",
+                      percentage: project.getAll()[i].difficulty,
                       title: project.getAll()[i].name,
                       name: project.getAll()[i].ownerPassword,
                     );
                   }
                 ) : 
-                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: "", name: "",)
+                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",)
             ],
           ),
           Column(
@@ -179,6 +192,8 @@ class _LandingPageState extends State<LandingPage> {
             ],
           ),
         ]),
+
+
       ),
     );
   }
@@ -188,9 +203,9 @@ class OwnerCard extends StatelessWidget {
   final String title;
   final String name;
   final Color color;
-  final String percentage;
+  final int percentage;
   const OwnerCard({
-    this.percentage = "0%",
+    this.percentage = 0,
     this.color = Colors.red,
     this.title = "Components",
     this.name = "Markus Kohler",
@@ -227,7 +242,7 @@ class OwnerCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF666A6D))),
                 trailing: Text(
-                  this.percentage,
+                  this.percentage != 0 ? this.percentage.toString() : "",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ))),
