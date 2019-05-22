@@ -12,29 +12,44 @@ class Project{
 
   Graph graph;
 
-  Project(this.graph);
+  List<String> passwords = [];
+
+  Project(this.graph, [this.passwords]);
 
   factory Project.fromJSON(Map<String, dynamic> json){
     Graph graph = Graph();
+    List<String> pass = [];
 
     //add verticies to the graph
     List<dynamic> list = json["values"];
 
-    for (int i = 0; i < list.length; i++) {
-      graph.addNode(Component(list[i][0], 0));
+    //adds passwords to the list
+    for(int i = 0; i < list[0].length; i++){
+      pass.add(list[0][i].toString());
+    }
+
+    for (int i = 1; i < list.length; i++) {
+      graph.addNode(
+        Component(
+          list[i][0],
+          list[i][1] != "" ? int.parse(list[i][1]) : 0,
+          desc: list[i][2],
+          ownerPassword: list[i][3] 
+        )
+      );
     }
 
     //add edges to the graph
-    for (int i = 0; i < list.length; i++) {
-      for (int j = 1; j < list[i].length; j++) {
+    for (int i = 1; i < list.length; i++) {
+      for (int j = 4; j < list[i].length; j++) {
         if(list[i][j] == "1")
-          graph.addConnection(i, j-1);
+          graph.addConnection(i - 1, j-4);
       }
     }
 
     // graph.printGraph();
 
-    return Project(graph);
+    return Project(graph, pass);
   }
 
   List<Component> getAll() => graph.getComponents();
@@ -91,9 +106,9 @@ class Component{
   String name;
   String desc;
   String ownerPassword;
-  double percentage;
+  int difficulty;
   
-  Component(this.name, this.percentage, {this.ownerPassword = "", this.desc = ""});
+  Component(this.name, this.difficulty, {this.ownerPassword = "", this.desc = ""});
 
 }
 
