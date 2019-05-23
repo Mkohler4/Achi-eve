@@ -34,8 +34,8 @@ class Project{
         list[i][0],
         list[i][1] != "" ? int.parse(list[i][1]) : 0,
         desc: list[i][2],
-        ownerPassword: list[i][3],
-        done: list[i][3] == "done" ? true : false
+        ownerPassword: list[i][4],
+        done: list[i][3] == "1" ? true : false
       );
 
       graph.addNode(comp);
@@ -43,9 +43,9 @@ class Project{
 
     //add edges to the graph
     for (int i = 1; i < list.length; i++) {
-      for (int j = 4; j < list[i].length; j++) {
+      for (int j = 5; j < list[i].length; j++) {
         if(list[i][j] == "1" && graph.getComponent(i-1).getData().done != true)
-          graph.addConnection(i - 1, j-4);
+          graph.addConnection(i - 1, j-5);
       }
     }
 
@@ -81,7 +81,7 @@ class Project{
   List<Component> ownerList(String password){
     List<Component> list = [];
     for (Component item in graph.getComponents()) {
-      if(item.ownerPassword == password) list.add(item);
+      if(item.ownerPassword == password && item.done == false) list.add(item);
     }
 
     return list;
@@ -107,7 +107,7 @@ class Project{
   List<Component> takenList(String password){
     List<Component> list = [];
     for (Component item in graph.getComponents()) {
-      if(item.ownerPassword != password && item.ownerPassword != "") list.add(item);
+      if(item.ownerPassword != password && item.ownerPassword != "" && item.done == false) list.add(item);
     }
 
     return list;
