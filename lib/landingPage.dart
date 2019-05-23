@@ -158,29 +158,20 @@ class _LandingPageState extends State<LandingPage> {
                   ListView.builder(
                     itemCount: project != null ? project.ownerList(userPassword).length : 0,
                     itemBuilder: (context, int i) {
-                      return new OwnerCard(
-                        color: Colors.green,
-                        percentage:  project.ownerList(userPassword)[i].difficulty,
-                        title: project.ownerList(userPassword)[i].name,
-                        name: project.ownerList(userPassword)[i].ownerPassword,
-                      );
+                      return OwnerCard.fromComponent(project.ownerList(userPassword)[i], project, userPassword);
                     }
                   ) :
-                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
+                OwnerCard(color: Colors.white, title: "Nothing to show", points: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", points: 0, name: "",),
 
               project != null ?
                 project.openList().length != 0 ?
                   ListView.builder(
                     itemCount: project != null ? project.openList().length : 0,
                     itemBuilder: (context, int i) {
-                      return new OwnerCard(
-                        color: Colors.yellow,
-                        title: project.openList()[i].name,
-                        name: project.openList()[i].ownerPassword,
-                      );
+                      return OwnerCard.fromComponent(project.openList()[i], project, userPassword);
                     }
                   ) : 
-                  OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
+                  OwnerCard(color: Colors.white, title: "Nothing to show", points: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", points: 0, name: "",),
 
               project != null ?
                 project.getAll().length != 0  && project != null ? 
@@ -188,20 +179,10 @@ class _LandingPageState extends State<LandingPage> {
                     
                     itemCount: project != null ? project.getAll().length : 0,
                     itemBuilder: (context, int i) {
-                      String status = project.componentStatus(project.getAll()[i], userPassword); //task status determiner
-                      return new OwnerCard(
-                        color:status == "O" ? Colors.yellow : //open tasks
-                              status == "Y" ? Colors.green : //owner tasks
-                              status == "T" ? Colors.red : //taken tasks
-                              status == "D" ? Colors.blue :
-                              Colors.grey, //closed takss
-                        percentage: project.getAll()[i].difficulty,
-                        title: project.getAll()[i].name,
-                        name: project.getAll()[i].ownerPassword,
-                      );
+                      return OwnerCard.fromComponent(project.getAll()[i], project, userPassword);
                     }
                   ) : 
-                  OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
+                  OwnerCard(color: Colors.white, title: "Nothing to show", points: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", points: 0, name: "",),
             ],
           ),
 
@@ -214,10 +195,11 @@ class _LandingPageState extends State<LandingPage> {
                 child: SegmentedPercentBar(
                   height: 30,
                   percentages: project != null ? [project.getProgress()/project.getTotalProgress()] : [0],
-                  progressColors: [Colors.black],
+                  progressColors: [Colors.blue],
                   borderColor: Colors.black,
                   backgroundColor: Colors.transparent,
                   borderRadius: 25,
+                  borderWidth: 1,
                 )
               ),
             ],
@@ -230,27 +212,37 @@ class _LandingPageState extends State<LandingPage> {
   }
 }
 
-class PercentBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      
-    );
-  }
-}
-
 class OwnerCard extends StatelessWidget {
   final String title;
   final String name;
   final Color color;
-  final int percentage;
+  final int points;
+
+  final Component component;
+  
   const OwnerCard({
-    this.percentage = 0,
+    this.component,
+    this.points = 0,
     this.color = Colors.red,
     this.title = "Components",
     this.name = "Markus Kohler",
     Key key,
   }) : super(key: key);
+
+  factory OwnerCard.fromComponent(Component comp, Project project, String password){
+    String status = project.componentStatus(comp, password); //task status determiner
+    return OwnerCard(
+      component: comp,
+      points: comp.difficulty,
+      color:status == "O" ? Colors.yellow : //open tasks
+            status == "Y" ? Colors.green : //owner tasks
+            status == "T" ? Colors.red : //taken tasks
+            status == "D" ? Colors.blue :
+            Colors.grey, //closed takss
+      name: comp.ownerPassword,
+      title: comp.name,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -258,7 +250,7 @@ class OwnerCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DiscriptionPage()),
+          MaterialPageRoute(builder: (context) => DiscriptionPage(title: component.name, discription: component.desc,)),
         );
       },
       child: Card(
@@ -282,7 +274,7 @@ class OwnerCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF666A6D))),
                 trailing: Text(
-                  this.percentage != 0 ? this.percentage.toString() : "",
+                  this.points != 0 ? this.points.toString() : "",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ))),

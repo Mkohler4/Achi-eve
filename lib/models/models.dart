@@ -44,7 +44,7 @@ class Project{
     //add edges to the graph
     for (int i = 1; i < list.length; i++) {
       for (int j = 4; j < list[i].length; j++) {
-        if(list[i][j] == "1")
+        if(list[i][j] == "1" && graph.getComponent(i-1).getData().done != true)
           graph.addConnection(i - 1, j-4);
       }
     }
