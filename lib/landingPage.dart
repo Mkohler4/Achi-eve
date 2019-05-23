@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'discriptionPage.dart';
 import 'models/models.dart';
+import 'percentBar.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -16,7 +17,7 @@ class LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<LandingPage> {
 
-  String userPassword;
+  String userPassword = "ibte";
 
   Project project;
 
@@ -49,7 +50,7 @@ class _LandingPageState extends State<LandingPage> {
               child: Center(child: Text("Options", style: TextStyle(fontSize: 20),)),
             ),
             TextFormField(
-              
+
             )
           ],
         ),
@@ -59,10 +60,9 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    userPassword = json.decode("info.json")["name"];
+    // userPassword = "ibte";
 
     pullInfo(); //starts by pulling the ifo from the server
   }
@@ -153,70 +153,72 @@ class _LandingPageState extends State<LandingPage> {
         body: Stack(children: <Widget>[
           TabBarView(
             children: [
-              project.ownerList(userPassword).length != 0 && project != null ?
-                ListView.builder(
-                  itemCount: project != null ? project.ownerList(userPassword).length : 0,
-                  itemBuilder: (context, int i) {
-                    return new OwnerCard(
-                      color: Colors.green,
-                      percentage:  project.ownerList(userPassword)[i].difficulty,
-                      title: project.ownerList(userPassword)[i].name,
-                      name: project.ownerList(userPassword)[i].ownerPassword,
-                    );
-                  }
-                ) :
-              OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
+              project != null ?
+                project.ownerList(userPassword).length != 0 ?
+                  ListView.builder(
+                    itemCount: project != null ? project.ownerList(userPassword).length : 0,
+                    itemBuilder: (context, int i) {
+                      return new OwnerCard(
+                        color: Colors.green,
+                        percentage:  project.ownerList(userPassword)[i].difficulty,
+                        title: project.ownerList(userPassword)[i].name,
+                        name: project.ownerList(userPassword)[i].ownerPassword,
+                      );
+                    }
+                  ) :
+                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
 
-              project.openList().length != 0  && project != null ?
-                ListView.builder(
-                  itemCount: project != null ? project.openList().length : 0,
-                  itemBuilder: (context, int i) {
-                    return new OwnerCard(
-                      color: Colors.yellow,
-                      title: project.openList()[i].name,
-                      name: project.openList()[i].ownerPassword,
-                    );
-                  }
-                ) : 
-                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
+              project != null ?
+                project.openList().length != 0 ?
+                  ListView.builder(
+                    itemCount: project != null ? project.openList().length : 0,
+                    itemBuilder: (context, int i) {
+                      return new OwnerCard(
+                        color: Colors.yellow,
+                        title: project.openList()[i].name,
+                        name: project.openList()[i].ownerPassword,
+                      );
+                    }
+                  ) : 
+                  OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
 
-              project.getAll().length != 0  && project != null ? 
-                ListView.builder(
-                  
-                  itemCount: project != null ? project.getAll().length : 0,
-                  itemBuilder: (context, int i) {
-                    String status = project.componentStatus(project.getAll()[i], userPassword); //task status determiner
-                    return new OwnerCard(
-                      color:status == "O" ? Colors.yellow : //open tasks
-                            status == "Y" ? Colors.green : //owner tasks
-                            status == "T" ? Colors.red : //taken tasks
-                            Colors.grey, //closed takss
-                      percentage: project.getAll()[i].difficulty,
-                      title: project.getAll()[i].name,
-                      name: project.getAll()[i].ownerPassword,
-                    );
-                  }
-                ) : 
-                OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",)
+              project != null ?
+                project.getAll().length != 0  && project != null ? 
+                  ListView.builder(
+                    
+                    itemCount: project != null ? project.getAll().length : 0,
+                    itemBuilder: (context, int i) {
+                      String status = project.componentStatus(project.getAll()[i], userPassword); //task status determiner
+                      return new OwnerCard(
+                        color:status == "O" ? Colors.yellow : //open tasks
+                              status == "Y" ? Colors.green : //owner tasks
+                              status == "T" ? Colors.red : //taken tasks
+                              status == "D" ? Colors.blue :
+                              Colors.grey, //closed takss
+                        percentage: project.getAll()[i].difficulty,
+                        title: project.getAll()[i].name,
+                        name: project.getAll()[i].ownerPassword,
+                      );
+                    }
+                  ) : 
+                  OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",) : OwnerCard(color: Colors.white, title: "Nothing to show", percentage: 0, name: "",),
             ],
           ),
+
+          //PROGRESS BAR
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Card(
-                  margin:
-                      EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 5),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  elevation: 4.0,
-                  color: Colors.black,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: 1, bottom: 14, left: 100, right: 300),
-                  ),
-                ),
+                padding: const EdgeInsets.only(bottom: 40.0, left: 15, right: 15),
+                child: SegmentedPercentBar(
+                  height: 30,
+                  percentages: project != null ? [project.getProgress()/project.getTotalProgress()] : [0],
+                  progressColors: [Colors.black],
+                  borderColor: Colors.black,
+                  backgroundColor: Colors.transparent,
+                  borderRadius: 25,
+                )
               ),
             ],
           ),
@@ -224,6 +226,15 @@ class _LandingPageState extends State<LandingPage> {
 
 
       ),
+    );
+  }
+}
+
+class PercentBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      
     );
   }
 }

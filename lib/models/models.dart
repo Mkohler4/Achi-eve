@@ -2,6 +2,7 @@
 class Profile{
   String _name;
   String password;
+  
 
   Profile(this._name, this.password);
 
@@ -29,14 +30,15 @@ class Project{
     }
 
     for (int i = 1; i < list.length; i++) {
-      graph.addNode(
-        Component(
-          list[i][0],
-          list[i][1] != "" ? int.parse(list[i][1]) : 0,
-          desc: list[i][2],
-          ownerPassword: list[i][3] 
-        )
+      Component comp = Component(
+        list[i][0],
+        list[i][1] != "" ? int.parse(list[i][1]) : 0,
+        desc: list[i][2],
+        ownerPassword: list[i][3],
+        done: list[i][3] == "done" ? true : false
       );
+
+      graph.addNode(comp);
     }
 
     //add edges to the graph
@@ -47,19 +49,39 @@ class Project{
       }
     }
 
-    // graph.printGraph();
 
     return Project(graph, pass);
   }
 
-  List<Component> getAll() => graph.getComponents();
+  ///gets the finished progress for the project
+  double getProgress(){
+    double progress = 0;
+    for (Component comp in getAll()) {
+      if(comp.done == true)
+        progress += comp.difficulty;
+    }
+    return progress;
+  }
+
+  ///gets the points for the project
+  double getTotalProgress(){
+    double max = 0;
+    for (Component comp in getAll()) {
+      max += comp.difficulty;
+    }
+    return max;
+  }
+
+  List<Component> getAll() {
+    List<Component> list = graph.getComponents();
+    // list.addAll(done);
+    return list;
+  }
 
   List<Component> ownerList(String password){
     List<Component> list = [];
-    print(password);
     for (Component item in graph.getComponents()) {
       if(item.ownerPassword == password) list.add(item);
-      print(item.ownerPassword);
     }
 
     return list;
@@ -96,8 +118,10 @@ class Project{
   ///Y - yours
   ///T - taken
   ///C - closed
+  ///D - done
   String componentStatus(Component comp, String password){
-    if(openList().contains(comp)) return "O";
+    if(comp.done == true) return "D";
+    else if(openList().contains(comp)) return "O";
     else if(ownerList(password).contains(comp)) return "Y";
     else if(takenList(password).contains(comp)) return "T";
     else return "C";
@@ -110,8 +134,10 @@ class Component{
   String desc;
   String ownerPassword;
   int difficulty;
+
+  bool done;
   
-  Component(this.name, this.difficulty, {this.ownerPassword = "", this.desc = ""});
+  Component(this.name, this.difficulty, {this.ownerPassword = "", this.desc = "", this.done = false});
 
 }
 
