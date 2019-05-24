@@ -219,6 +219,9 @@ class OwnerCard extends StatelessWidget {
   final int points;
 
   final Component component;
+  final Project project;
+
+  final String status;
   
   const OwnerCard({
     this.component,
@@ -227,6 +230,8 @@ class OwnerCard extends StatelessWidget {
     this.title = "Components",
     this.name = "Markus Kohler",
     Key key,
+    this.project,
+    this.status
   }) : super(key: key);
 
   factory OwnerCard.fromComponent(Component comp, Project project, String password){
@@ -241,6 +246,8 @@ class OwnerCard extends StatelessWidget {
             Colors.grey, //closed takss
       name: comp.ownerPassword,
       title: comp.name,
+      project: project,
+      status: status,
     );
   }
 
@@ -250,7 +257,7 @@ class OwnerCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DiscriptionPage(title: component.name, discription: component.desc,)),
+          MaterialPageRoute(builder: (context) => DiscriptionPage.fromComponent(component, project, status)),
         );
       },
       child: Card(
