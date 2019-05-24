@@ -26,28 +26,13 @@ class _LandingPageState extends State<LandingPage> {
   String spreadsheetID = "1UyYdOLiPKpJ_0qkSnWFzriqiVcu6CnfZQibdeKya-sM";
   String apiKey = "AIzaSyA8fqeR9BYGxm_AV1h3nZ0fhFt_XSuF9p0";
 
-  Future<void> pullInfo() async{
-    final response =
-        await http.get("https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetID}/values/Sheet1?key=${apiKey}");
-
-    if (response.statusCode == 200) {
-      // If server returns an OK response, parse the JSON
-      setState(() {
-        project = Project.fromJSON(json.decode(response.body));
-      });
-    } else {
-      // If that response was not OK, throw an error.
-      throw Exception('Failed to load post');
-    }
-  }
-
-  Future<void> pullInfov2() async{    
-    await Firestore.instance.collection("Project").document('PujoBpCzFtLW61TQUG8Z').get().then((DocumentSnapshot doc){
+  Future<void> pullInfo() async{    
+    Firestore.instance.collection("Project").where("name", isEqualTo: "test").snapshots().listen((data) => data.documents.forEach((DocumentSnapshot doc){
       setState(() {
        project = Project.fromFirebase(doc); 
       });
-    });
-
+    }));
+          
   }
 
   Widget options(){
@@ -75,8 +60,7 @@ class _LandingPageState extends State<LandingPage> {
 
     // userPassword = "ibte";
 
-    // pullInfo(); //starts by pulling the ifo from the server
-    pullInfov2();
+    pullInfo(); //starts by pulling the ifo from the server
   }
 
   @override
