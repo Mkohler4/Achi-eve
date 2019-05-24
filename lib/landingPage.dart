@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
 import 'discriptionPage.dart';
 import 'models/models.dart';
 import 'percentBar.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LandingPage extends StatefulWidget {
   bool isSelected1;
@@ -39,6 +41,15 @@ class _LandingPageState extends State<LandingPage> {
     }
   }
 
+  Future<void> pullInfov2() async{    
+    await Firestore.instance.collection("Project").document('PujoBpCzFtLW61TQUG8Z').get().then((DocumentSnapshot doc){
+      setState(() {
+       project = Project.fromFirebase(doc); 
+      });
+    });
+
+  }
+
   Widget options(){
     return AlertDialog(
       content: Form(
@@ -64,7 +75,8 @@ class _LandingPageState extends State<LandingPage> {
 
     // userPassword = "ibte";
 
-    pullInfo(); //starts by pulling the ifo from the server
+    // pullInfo(); //starts by pulling the ifo from the server
+    pullInfov2();
   }
 
   @override

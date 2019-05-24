@@ -1,4 +1,8 @@
 
+import 'dart:ui';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Profile{
   String _name;
   String password;
@@ -48,6 +52,41 @@ class Project{
           graph.addConnection(i - 1, j-5);
       }
     }
+
+    return Project(graph, pass);
+  }
+
+  factory Project.fromFirebase(DocumentSnapshot doc){
+    Graph graph = Graph();
+    List<String> pass = [];
+
+    Map<String, dynamic> map = doc.data;
+
+    for(String password in map['passwords']){
+      pass.add(password);
+    }
+
+    List<dynamic> vertecies = map['vertecies'];
+
+    for(dynamic vertex in vertecies){
+      Component comp = Component(
+        vertex['name'],
+        vertex['points'],
+        desc: vertex['desc'],
+        done: vertex['done'],
+        ownerPassword: vertex['owner']
+      );
+
+      graph.addNode(comp);
+    }
+
+    for(int i = 0; i < vertecies.length; i++){
+      for(int j = 0; j < vertecies.length; j++){
+        if(vertecies[i]['edges'][j] == true) graph.addConnection(i, j);
+      }
+    }
+
+    print(doc['passwords'][0]);
 
 
     return Project(graph, pass);

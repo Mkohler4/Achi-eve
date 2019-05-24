@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "87167616978",
+    "firebase_url": "https://achi-eve.firebaseio.com",
+    "project_id": "achi-eve",
+    "storage_bucket": "achi-eve.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:87167616978:android:23a5929fd0793073",
+        "android_client_info": {
+          "package_name": "com.example.achieve"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "87167616978-iq90la7rfat8oi1it83cuda33atb0r08.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGKOioZGDoiQefDLedVXygUcvqTdJobWA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "87167616978-iq90la7rfat8oi1it83cuda33atb0r08.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "87167616978-o5kphnfa23ti2u96ub0j08efo4do9las.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.achieve"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
