@@ -6,6 +6,8 @@ import 'landingPage.dart';
 import 'models/models.dart';
 import 'package:http/http.dart' as http;
 
+import 'addProjectPage.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LandingPage(),
+      home: AddProjectPage(),
       debugShowCheckedModeBanner: false,
     );
   }
