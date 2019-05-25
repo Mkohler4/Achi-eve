@@ -7,13 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddProjectPage extends StatefulWidget {
 
-  Graph graph;
-  List<String> pass;
-
-  AddProjectPage(){
-    graph = Graph();
-    pass = [];
-  }
+  final Graph graph = Graph();
+  final List<String> pass = [];
 
   @override
   _AddProjectPageState createState() => _AddProjectPageState();
@@ -37,6 +32,12 @@ class _AddProjectPageState extends State<AddProjectPage> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
@@ -49,7 +50,22 @@ class _AddProjectPageState extends State<AddProjectPage> {
             itemCount: widget.graph.getComponents().length,
             itemBuilder: (BuildContext context, i){
               Component comp = widget.graph.getComponent(i).getData();
-              return Text(comp.name);
+              return Card(
+                child: ListTile(
+                  title: Text(comp.name),
+                  subtitle: comp.desc != "" ? Text(comp.desc) : null,
+                  leading: Text(comp.difficulty.toString(), style: TextStyle(fontSize: 20),),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    color: Colors.red,
+                    onPressed: () {
+                      setState(() {
+                        this.widget.graph.removeNode(comp);
+                      });
+                    },
+                  ),
+                ),
+              );
             },
           ),
           IconButton(

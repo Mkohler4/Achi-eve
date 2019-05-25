@@ -218,6 +218,26 @@ class Graph{
     _vertecies.add(Vertex(component));
   }
 
+  void removeNode(Component comp){
+    List<Edge> removeEgdes = [];
+    for(Edge edge in _edges){
+      if(edge.endPoints[0].getData() == comp || edge.endPoints[1].getData() == comp)
+        removeEgdes.add(edge);
+    }
+    for(Edge edge in removeEgdes){
+      _edges.remove(edge);
+    }
+
+    List<Vertex> removeVertex = [];
+    for(Vertex vertex in _vertecies){
+      if(vertex.getData() == comp)
+        removeVertex.add(vertex);
+    }
+    for(Vertex vertex in removeVertex){
+      _vertecies.remove(vertex);
+    }
+  }
+
   void addConnection(int startIndex, int endIndex){
     Edge e = Edge(getComponent(startIndex), getComponent(endIndex));
     getComponent(startIndex).outgoing.add(e);
