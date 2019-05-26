@@ -16,10 +16,7 @@ class AddProjectPage extends StatefulWidget {
 
 class _AddProjectPageState extends State<AddProjectPage> {
 
-  int count = 0;
-
   final _formKey = GlobalKey<FormState>();
-  double pointSlider = 1;
 
   void addVertex(String name, String desc, int points){
     setState(() {
@@ -31,20 +28,62 @@ class _AddProjectPageState extends State<AddProjectPage> {
     });
   }
 
+  void addEdge(Component start, Component end){
+    setState(() {
+      int startIndex = this.widget.graph.getComponentIndex(start);
+      int endIndex = this.widget.graph.getComponentIndex(end);
+      this.widget.graph.addConnection(startIndex, endIndex);
+    });
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Column(
+      appBar: AppBar(
+        title: Text("Create a Project"),
+        actions: <Widget>[
+          MaterialButton(
+            onPressed: (){
+              if(_formKey.currentState.validate()){
+                Project project = Project(this.widget.graph);
+
+                this.widget.pass.add("hi");
+              }
+            },
+            child: Text("Save", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),),
+            color: Colors.blue,
+            highlightColor: Colors.transparent,
+          ),
+        ],
+      ),
+      body: ListView(
         children: <Widget>[
-          Text("Verticies:"),
+          Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 15),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Name",
+                  hintText: "The name of the project",
+                ),
+                validator: (String val){
+                  if(val.isEmpty) return "Project name can not be empty";
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20, bottom: 20),
+            child: Center(child: Text("Verticies", style: TextStyle(color: Colors.black, fontSize: 30,),)),
+          ),
           ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemCount: widget.graph.getComponents().length,
@@ -71,10 +110,49 @@ class _AddProjectPageState extends State<AddProjectPage> {
           IconButton(
             icon: Icon(Icons.add),
             color: Colors.blue,
+            iconSize: 30,
             onPressed: (){
               showDialog(
                 context: context,
-                builder: (BuildContext context) => _AddVertex(callBack: addVertex,)
+                builder: (BuildContext context) => _AddVertexDialog(callBack: addVertex,)
+              );
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20, bottom: 20),
+            child: Center(child: Text("Edges:", style: TextStyle(color: Colors.black, fontSize: 30,),)),
+          ),
+          ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: widget.graph.getEdges().length,
+            itemBuilder: (BuildContext context, i){
+              Edge edge = widget.graph.getEdges()[i];
+              return Card(
+                child: ListTile(
+                  title: Text(edge.endPoints[0].getData().name.toString() + "  ->  " + edge.endPoints[1].getData().name.toString()),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    color: Colors.red,
+                    onPressed: () {
+                      setState(() {
+                        this.widget.graph.removeEdge(edge);
+                      });
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.add),
+            color: Colors.blue,
+            iconSize: 30,
+            onPressed: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => _AddEdgeDialog(components: this.widget.graph.getComponents(), callBack: addEdge,)
               );
             },
           )
@@ -84,11 +162,117 @@ class _AddProjectPageState extends State<AddProjectPage> {
   }
 }
 
-class _AddVertex extends StatefulWidget {
+class _AddEdgeDialog extends StatefulWidget {
+
+  final List<Component> components;
+  final Function callBack;
+
+  const _AddEdgeDialog({
+    Key key,
+    @required this.components,
+    this.callBack
+  }) : super(key: key);
+
+  @override
+  __AddEdgeDialogState createState() => __AddEdgeDialogState();
+}
+
+class __AddEdgeDialogState extends State<_AddEdgeDialog> {
+
+  Component comp1;
+  Component comp2;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    comp1 = null;
+    comp2 = null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      title: Text("Add Edge"),
+      actions: <Widget>[
+        MaterialButton(
+          child: Text("Cancel", style: TextStyle(color: Colors.red),),
+          onPressed: () => Navigator.pop(context),
+          color: Colors.transparent,
+          elevation: 0,
+          highlightElevation: 0,
+        ),
+        MaterialButton(
+          child: Text("Save", style: TextStyle(color: 
+            comp1 == null || comp2 == null || comp1 == comp2 ? Colors.grey : Colors.blue
+          ),),
+          onPressed: (){
+            if(comp1 != null && comp2 != null && comp1 != comp2){
+              if(this.widget.callBack != null) this.widget.callBack(comp1, comp2);
+              Navigator.pop(context);
+            }
+          },
+          color: Colors.transparent,
+          elevation: 0,
+          highlightElevation: 0,
+        ),
+      ],
+      content: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TitledWidget(
+              "From:",
+              widget: DropdownButton<Component>(
+                value: comp1,
+                items: this.widget.components.map<DropdownMenuItem<Component>>((Component value) {
+                  return DropdownMenuItem<Component>(
+                    value: value,
+                    child: Text(value.name),
+                  );
+                }).toList(), 
+                onChanged: (Component value) {
+                  setState(() {
+                    comp1 = value;
+                  });
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0, bottom: 20),
+              child: TitledWidget(
+                "To:",
+                widget: DropdownButton<Component>(
+                  value: comp2,
+                  items: this.widget.components.map<DropdownMenuItem<Component>>((Component value) {
+                    return DropdownMenuItem<Component>(
+                      value: value,
+                      child: Text(value.name),
+                    );
+                  }).toList(), 
+                  onChanged: (Component value) {
+                    setState(() {
+                      comp2 = value;
+                    });
+                  },
+                ),
+              ),
+            ),
+            (comp1 != null && comp2 != null) && comp1 == comp2 ?
+              Text("An edge cannot lead back to itself", style: TextStyle(color: Colors.red, fontSize: 13),) : Container()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AddVertexDialog extends StatefulWidget {
   
   final Function callBack;
 
-  _AddVertex({
+  _AddVertexDialog({
     Key key,
     this.callBack
   }) : super(key: key);
@@ -96,10 +280,10 @@ class _AddVertex extends StatefulWidget {
   
 
   @override
-  __AddVertexState createState() => __AddVertexState();
+  _AddVertexDialogState createState() => _AddVertexDialogState();
 }
 
-class __AddVertexState extends State<_AddVertex> {
+class _AddVertexDialogState extends State<_AddVertexDialog> {
   
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   int pointSlider = 0;
@@ -132,7 +316,7 @@ class __AddVertexState extends State<_AddVertex> {
             print("saved");
             if(_formKey.currentState.validate()){
               _formKey.currentState.save();
-              this.widget.callBack(name, desc, pointSlider);
+              if(this.widget.callBack != null) this.widget.callBack(name, desc, pointSlider);
               Navigator.pop(context);
             }
           },
@@ -155,7 +339,8 @@ class __AddVertexState extends State<_AddVertex> {
                   name = value;
                 },
                 validator: (String value) {
-                  return value.isEmpty ? 'Vertex name cannot be empty' : null;
+                  if(value.isEmpty) return 'Vertex name cannot be empty';
+                  //TODO: made sure 2 components cannot be named the same
                 },
               ),
               Padding(

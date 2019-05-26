@@ -214,6 +214,8 @@ class Graph{
     return list;
   }
 
+  List<Edge> getEdges() => _edges;
+
   void addNode(Component component){
     _vertecies.add(Vertex(component));
   }
@@ -238,6 +240,10 @@ class Graph{
     }
   }
 
+  void removeEdge(Edge e){
+    _edges.remove(e);
+  }
+
   void addConnection(int startIndex, int endIndex){
     Edge e = Edge(getComponent(startIndex), getComponent(endIndex));
     getComponent(startIndex).outgoing.add(e);
@@ -252,9 +258,16 @@ class Graph{
     return _vertecies[index];
   }
 
-  int getComponentIndex(Vertex comp){
+  int getVertexIndex(Vertex comp){
     for (int i = 0; i < _vertecies.length; i++) {
       if(_vertecies[i] == comp) return i;
+    }
+    return -1;
+  }
+
+  int getComponentIndex(Component comp){
+    for (int i = 0; i < _vertecies.length; i++) {
+      if(_vertecies[i].getData() == comp) return i;
     }
     return -1;
   }
