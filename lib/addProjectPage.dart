@@ -7,8 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddProjectPage extends StatefulWidget {
 
-  final Graph graph = Graph();
-  final List<String> pass = [];
+  AddProjectPage(){}
 
   @override
   _AddProjectPageState createState() => _AddProjectPageState();
@@ -18,23 +17,28 @@ class _AddProjectPageState extends State<AddProjectPage> {
 
   final _formKey = GlobalKey<FormState>();
 
+  final Graph graph = Graph();
+  final List<String> pass = [];
+
   String projectName;
 
   void addVertex(String name, String desc, int points){
     setState(() {
-      this.widget.graph.addNode(Component(
+      graph.addNode(Component(
         name,
         points,
         desc: desc
       )); 
     });
+
+    
   }
 
   void addEdge(Component start, Component end){
     setState(() {
-      int startIndex = this.widget.graph.getComponentIndex(start);
-      int endIndex = this.widget.graph.getComponentIndex(end);
-      this.widget.graph.addConnection(startIndex, endIndex);
+      int startIndex = graph.getComponentIndex(start);
+      int endIndex = graph.getComponentIndex(end);
+      graph.addConnection(startIndex, endIndex);
     });
   }
 
@@ -57,7 +61,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
                   _formKey.currentState.save();
                 });
 
-                Project project = Project(this.widget.graph, this.widget.pass, projectName);
+                Project project = Project(graph, pass, projectName);
 
                 project.uploadToFireBase();
 
@@ -98,9 +102,9 @@ class _AddProjectPageState extends State<AddProjectPage> {
             physics: NeverScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
-            itemCount: widget.graph.getComponents().length,
+            itemCount: graph.getComponents().length,
             itemBuilder: (BuildContext context, i){
-              Component comp = widget.graph.getComponent(i).getData();
+              Component comp = graph.getComponent(i).getData();
               return Card(
                 child: ListTile(
                   title: Text(comp.name),
@@ -111,7 +115,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
                     color: Colors.red,
                     onPressed: () {
                       setState(() {
-                        this.widget.graph.removeNode(comp);
+                        graph.removeNode(comp);
                       });
                     },
                   ),
@@ -138,9 +142,9 @@ class _AddProjectPageState extends State<AddProjectPage> {
             physics: NeverScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
-            itemCount: widget.graph.getEdges().length,
+            itemCount: graph.getEdges().length,
             itemBuilder: (BuildContext context, i){
-              Edge edge = widget.graph.getEdges()[i];
+              Edge edge = graph.getEdges()[i];
               return Card(
                 child: ListTile(
                   title: Text(edge.endPoints[0].getData().name.toString() + "  ->  " + edge.endPoints[1].getData().name.toString()),
@@ -149,7 +153,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
                     color: Colors.red,
                     onPressed: () {
                       setState(() {
-                        this.widget.graph.removeEdge(edge);
+                        graph.removeEdge(edge);
                       });
                     },
                   ),
@@ -164,7 +168,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
             onPressed: (){
               showDialog(
                 context: context,
-                builder: (BuildContext context) => _AddEdgeDialog(components: this.widget.graph.getComponents(), callBack: addEdge,)
+                builder: (BuildContext context) => _AddEdgeDialog(components: graph.getComponents(), callBack: addEdge,)
               );
             },
           )
@@ -325,7 +329,6 @@ class _AddVertexDialogState extends State<_AddVertexDialog> {
         MaterialButton(
           child: Text("Save", style: TextStyle(color: Colors.blue),),
           onPressed: (){
-            print("saved");
             if(_formKey.currentState.validate()){
               _formKey.currentState.save();
               if(this.widget.callBack != null) this.widget.callBack(name, desc, pointSlider);

@@ -261,6 +261,10 @@ class Graph{
   final List<Edge> _edges = [];
   final List<Vertex> _vertecies = [];
 
+  Graph(){
+    print("bruh");
+  }
+
   List<Component> getComponents(){
     List<Component> list = [];
     for (Vertex vertex in _vertecies) {
@@ -286,7 +290,6 @@ class Graph{
     for(Edge edge in removeEgdes){
       _edges.remove(edge);
     }
-
     List<Vertex> removeVertex = [];
     for(Vertex vertex in _vertecies){
       if(vertex.getData() == comp)
