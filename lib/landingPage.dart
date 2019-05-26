@@ -27,13 +27,12 @@ class _LandingPageState extends State<LandingPage> {
   String spreadsheetID = "1UyYdOLiPKpJ_0qkSnWFzriqiVcu6CnfZQibdeKya-sM";
   String apiKey = "AIzaSyA8fqeR9BYGxm_AV1h3nZ0fhFt_XSuF9p0";
 
-  Future<void> pullInfo() async{    
-    Firestore.instance.collection("Project").where("name", isEqualTo: "test").snapshots().listen((data) => data.documents.forEach((DocumentSnapshot doc){
+  Future<void> pullInfo(String hash) async{    
+    await Firestore.instance.collection("Project").document(hash).get().then((DocumentSnapshot doc){
       setState(() {
-       project = Project.fromFirebase(doc); 
+        project = Project.fromFirebase(doc); 
       });
-    }));
-          
+    });     
   }
 
   void updatePassword(String val){
@@ -47,7 +46,6 @@ class _LandingPageState extends State<LandingPage> {
   void initState() {
     super.initState();
 
-    pullInfo(); //starts by pulling the ifo from the server
   }
 
   @override
@@ -64,17 +62,25 @@ class _LandingPageState extends State<LandingPage> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (BuildContext context) => _NameAlert(callBack: updatePassword,)
+                  builder: (BuildContext context) => _OptionsAlert(callBack: updatePassword, title: "Name",)
                 );
               },
             )
           ],
           iconTheme: new IconThemeData(color: Colors.black),
-          title: Text(project != null ? project.name.toUpperCase() : "Project",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 23)),
+          title: GestureDetector(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => _OptionsAlert(callBack: pullInfo, title: "Project Hash",)
+              );
+            },
+            child: Text(project != null ? project.name.toUpperCase() : "Project",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 23)),
+          ),
           centerTitle: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -250,20 +256,22 @@ class OwnerCard extends StatelessWidget {
   }
 }
 
-class _NameAlert extends StatefulWidget {
+class _OptionsAlert extends StatefulWidget {
 
   final Function callBack;
+  final String title;
 
-  _NameAlert({
+  _OptionsAlert({
     @required this.callBack,
+    this.title = "",
     Key key,
   }) : super(key: key);
 
   @override
-  __NameAlertState createState() => __NameAlertState();
+  _OptionsAlertState createState() => _OptionsAlertState();
 }
 
-class __NameAlertState extends State<_NameAlert> {
+class _OptionsAlertState extends State<_OptionsAlert> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -295,7 +303,7 @@ class __NameAlertState extends State<_NameAlert> {
             key: _formKey,
             child: TextFormField(
               decoration: InputDecoration(
-                labelText: "Name",
+                labelText: this.widget.title,
                 hintText: "Rename"
               ),
               validator: (String val){
