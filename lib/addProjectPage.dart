@@ -18,6 +18,8 @@ class _AddProjectPageState extends State<AddProjectPage> {
 
   final _formKey = GlobalKey<FormState>();
 
+  String projectName;
+
   void addVertex(String name, String desc, int points){
     setState(() {
       this.widget.graph.addNode(Component(
@@ -38,6 +40,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
 
   @override
   void initState() {
+    projectName = "";
     super.initState();
   }
 
@@ -50,7 +53,13 @@ class _AddProjectPageState extends State<AddProjectPage> {
           MaterialButton(
             onPressed: (){
               if(_formKey.currentState.validate()){
-                Project project = Project(this.widget.graph);
+                setState(() {
+                  _formKey.currentState.save();
+                });
+
+                Project project = Project(this.widget.graph, this.widget.pass, projectName);
+
+                project.uploadToFireBase();
 
                 this.widget.pass.add("hi");
               }
@@ -74,6 +83,9 @@ class _AddProjectPageState extends State<AddProjectPage> {
                 ),
                 validator: (String val){
                   if(val.isEmpty) return "Project name can not be empty";
+                },
+                onSaved: (String val){
+                  projectName = val;
                 },
               ),
             ),
@@ -178,7 +190,7 @@ class _AddEdgeDialog extends StatefulWidget {
 }
 
 class __AddEdgeDialogState extends State<_AddEdgeDialog> {
-
+  //TODO: make sure no duplicates
   Component comp1;
   Component comp2;
 

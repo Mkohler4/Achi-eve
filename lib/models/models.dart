@@ -17,9 +17,11 @@ class Project{
 
   Graph graph;
 
+  String name;
+
   List<String> passwords = [];
 
-  Project(this.graph, [this.passwords]);
+  Project(this.graph, [this.passwords, this.name = ""]);
 
   factory Project.fromJSON(Map<String, dynamic> json){
     Graph graph = Graph();
@@ -91,6 +93,55 @@ class Project{
 
     return Project(graph, pass);
   }
+
+  Map<String, dynamic> toJSON(){
+    Map<String, dynamic> map = Map<String, dynamic>();
+
+    map['name'] = name;
+    map['passwords'] = passwords;
+
+    List<Map<String, dynamic>> verticies = List<Map<String, dynamic>>();
+
+    for(Vertex vertex in graph._vertecies){
+      Map<String, dynamic> vertexMap = Map<String, dynamic>();
+      vertexMap['desc'] = vertex.getData().desc;
+      vertexMap['done'] = vertex.getData().done;
+      vertexMap['name'] = vertex.getData().name;
+      vertexMap['owner'] = vertex.getData().ownerPassword;
+      vertexMap['points'] = vertex.getData().difficulty;
+      
+      List<bool> edges = [];
+      for (Vertex outgoing in graph._vertecies) {
+        edges.add(vertex.outgoingConnetsTo(outgoing));
+      }
+      vertexMap['edges'] = edges;
+
+      verticies.add(vertexMap);
+    }
+
+    map['vertecies'] = verticies;
+
+    return map;
+  }
+
+  //Publishes the project to firestore
+  void uploadToFireBase() async{
+    Map<String, dynamic> map = toJSON();
+
+    await Firestore.instance.collection("Project").add(map).then((DocumentReference doc) {
+      print("uploaded");
+    });
+  }
+
+  void saveToFireBase() async{
+    Map<String, dynamic> map = toJSON();
+
+    Firestore.instance.collection("Project").where("name", isEqualTo: name).snapshots().listen((data) => data.documents.forEach((DocumentSnapshot doc) {
+      doc.reference.updateData(map);
+      print("name: " + doc.data['name']);
+    }));
+  }
+
 
   ///gets the finished progress for the project
   double getProgress(){
@@ -198,6 +249,13 @@ class Vertex{
 
   Vertex(this._data);
 
+  bool outgoingConnetsTo(Vertex v){
+    for (Edge e in outgoing) {
+      if(e.endPoints[1] == v) return true;
+    }
+    return false;
+  }
+
   Component getData() => _data;
 
 }
@@ -213,6 +271,8 @@ class Graph{
     }
     return list;
   }
+
+  List<Vertex> getVertecies() => _vertecies;
 
   List<Edge> getEdges() => _edges;
 
