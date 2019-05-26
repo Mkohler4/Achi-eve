@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'discriptionPage.dart';
 import 'models/models.dart';
 import 'percentBar.dart';
+import 'addProjectPage.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -35,30 +36,16 @@ class _LandingPageState extends State<LandingPage> {
           
   }
 
-  Widget options(){
-    return AlertDialog(
-      content: Form(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(child: Text("Options", style: TextStyle(fontSize: 20),)),
-            ),
-            TextFormField(
-
-            )
-          ],
-        ),
-      ),
-    );
+  void updatePassword(String val){
+    setState(() {
+      userPassword = val;
+    });
   }
+
 
   @override
   void initState() {
     super.initState();
-
-    // userPassword = "ibte";
 
     pullInfo(); //starts by pulling the ifo from the server
   }
@@ -77,15 +64,13 @@ class _LandingPageState extends State<LandingPage> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (BuildContext context){
-                    return options();
-                  }
+                  builder: (BuildContext context) => _NameAlert(callBack: updatePassword,)
                 );
               },
             )
           ],
           iconTheme: new IconThemeData(color: Colors.black),
-          title: Text("Projects",
+          title: Text(project != null ? project.name.toUpperCase() : "Project",
               style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -121,27 +106,14 @@ class _LandingPageState extends State<LandingPage> {
 
         //DRAWER
         drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              ListTile(
-                selected: true,
-                title: Text(
-                  "Website",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                trailing: Icon(Icons.arrow_forward),
-                onTap: () {},
-              ),
-              ListTile(
-                selected: false,
-                title: Text(
-                  "Appliciation",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                trailing: Icon(Icons.arrow_forward),
-                onTap: () {},
-              ),
-            ],
+          child: Center(
+            child: MaterialButton(
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddProjectPage()));
+              },
+              child: Text("Add New Project", style: TextStyle(color: Colors.white, fontSize: 20),),
+              color: Colors.blue,
+            ),
           )
         ),
 
@@ -274,6 +246,68 @@ class OwnerCard extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ))),
+    );
+  }
+}
+
+class _NameAlert extends StatefulWidget {
+
+  final Function callBack;
+
+  _NameAlert({
+    @required this.callBack,
+    Key key,
+  }) : super(key: key);
+
+  @override
+  __NameAlertState createState() => __NameAlertState();
+}
+
+class __NameAlertState extends State<_NameAlert> {
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      actions: <Widget>[
+        MaterialButton(
+          child: Text("Save", style: TextStyle(color: Colors.blue),),
+          onPressed: (){
+            print("saved");
+            if(_formKey.currentState.validate()){
+              _formKey.currentState.save();
+              Navigator.pop(context);
+            }
+          },
+          color: Colors.transparent,
+          elevation: 0,
+          highlightElevation: 0,
+        ),
+      ],
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(child: Text("Options", style: TextStyle(fontSize: 20),)),
+          ),
+          Form(
+            key: _formKey,
+            child: TextFormField(
+              decoration: InputDecoration(
+                labelText: "Name",
+                hintText: "Rename"
+              ),
+              validator: (String val){
+                if(val.isEmpty) return "Name cannot be empty";
+              },
+              onSaved: (String val){
+                widget.callBack(val);
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 }

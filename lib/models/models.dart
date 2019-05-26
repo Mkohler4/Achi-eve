@@ -88,10 +88,7 @@ class Project{
       }
     }
 
-    print(doc['passwords'][0]);
-
-
-    return Project(graph, pass);
+    return Project(graph, pass, doc.data["name"]);
   }
 
   Map<String, dynamic> toJSON(){

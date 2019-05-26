@@ -61,7 +61,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
 
                 project.uploadToFireBase();
 
-                this.widget.pass.add("hi");
+                Navigator.pop(context);
               }
             },
             child: Text("Save", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),),
